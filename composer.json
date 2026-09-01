@@ -1,0 +1,13 @@
+{
+    "name": "usuario/receitas-culinarias",
+    "description": "Dicionario de Receitas Culinarias",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "Config\\": "Config/",
+            "Controller\\": "Controller/",
+            "Model\\": "model/"
+        }
+    },
+    "require": {}
+}
