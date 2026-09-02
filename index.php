@@ -1,7 +1,13 @@
 <?php
-
 require_once __DIR__ . '/vendor/autoload.php';
 
-// Exemplo de uso dos seus Namespaces:
-// $db = new Config\configuration();
-// $controller = new Controller\ImcController();
+use Controller\ReceitaController;
+
+$controller = new ReceitaController();
+$termo = $_GET['busca'] ?? '';
+
+if (!empty($termo)) {
+    $controller->buscar($termo);
+} else {
+    $controller->index();
+}
