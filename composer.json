@@ -6,7 +6,7 @@
         "psr-4": {
             "Config\\": "Config/",
             "Controller\\": "Controller/",
-            "Model\\": "model/"
+            "Model\\": "Model/"
         }
     },
     "require": {}
