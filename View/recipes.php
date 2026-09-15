@@ -1,95 +1,74 @@
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
+<?php
+session_start();
+require_once '../vendor/autoload.php';
+
+use Controller\RecipeController;
+use Controller\UserController;
+
+$recipeController = new RecipeController();
+$userController = new UserController();
+
+if (!$userController->isLoggedIn()) {
+    header('Location: ../index.php');
+    exit();
 }
 
-.container {
-    max-width: 400px;
-    margin: 60px auto;
-    background: #fff;
-    padding: 24px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+$user_id = $_SESSION['id'];
+$userInfo = $userController->getUserData($user_id);
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_id'])) {
+    $recipeController->deleteRecipe((int) $_POST['delete_id']);
+    header('Location: recipes.php');
+    exit();
 }
 
-.container.wide {
-    max-width: 600px;
-}
+$recipes = $recipeController->getRecipes($user_id);
+?>
 
-h2 {
-    text-align: center;
-    margin-top: 0;
-}
+<!DOCTYPE html>
+<html lang="pt-BR">
 
-label {
-    display: block;
-    margin-bottom: 4px;
-    font-size: 14px;
-}
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../templates/css/style.css">
+    <title>Receitas | Minhas Receitas</title>
+</head>
 
-input, textarea {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 14px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-}
+<body>
 
-button {
-    width: 100%;
-    padding: 10px;
-    background: #333;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
+    <header>
+        <span><?= htmlspecialchars($userInfo['name']) ?></span>
+        <nav>
+            <a href="home.php">Nova Receita</a>
+            <a href="recipes.php">Minhas Receitas</a>
+            <a href="../index.php">Sair</a>
+        </nav>
+    </header>
 
-button.delete {
-    width: auto;
-    background: #b02a2a;
-    padding: 6px 12px;
-    font-size: 13px;
-}
+    <div class="container wide">
+        <h2>Minhas Receitas</h2>
 
-.message {
-    color: #b02a2a;
-    text-align: center;
-}
+        <?php if (!$recipes): ?>
+            <p class="message">Nenhuma receita cadastrada ainda.</p>
+        <?php else: ?>
+            <?php foreach ($recipes as $recipe): ?>
+                <div class="recipe">
+                    <h3><?= htmlspecialchars($recipe['title']) ?></h3>
+                    <p><strong>Categoria:</strong> <?= htmlspecialchars($recipe['category']) ?></p>
+                    <p><strong>Tempo de Preparo:</strong> <?= htmlspecialchars($recipe['prep_time']) ?> min</p>
+                    <p><strong>Ingredientes:</strong> <?= nl2br(htmlspecialchars($recipe['ingredients'])) ?></p>
+                    <p><strong>Modo de Preparo:</strong> <?= nl2br(htmlspecialchars($recipe['instructions'])) ?></p>
 
-.footer-link {
-    text-align: center;
-    margin-top: 12px;
-    font-size: 14px;
-}
+                    <form method="POST">
+                        <input type="hidden" name="delete_id" value="<?= $recipe['id'] ?>">
+                        <button type="submit" class="delete">Excluir</button>
+                    </form>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </div>
 
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 14px 24px;
-    background: #fff;
-    border-bottom: 1px solid #ddd;
-}
+</body>
 
-header a {
-    margin-left: 12px;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
-}
-
-.recipe {
-    background: #fff;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    padding: 14px;
-    margin-bottom: 12px;
-}
-
-.recipe p {
-    margin: 4px 0;
-    font-size: 14px;
-}
+</html>
